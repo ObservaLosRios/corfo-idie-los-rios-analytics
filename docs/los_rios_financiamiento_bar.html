@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Financiamiento Innova por región</title>
+    <script src="https://code.highcharts.com/highcharts.js" defer></script>
+    <script src="https://code.highcharts.com/modules/data.js" defer></script>
+    <style>
+        :root {
+            --bg-light: #f9fafb;
+            --bg-dark: #0f172a;
+            --text-light: #0f172a;
+            --text-dark: #f3f4f6;
+            --muted-light: #4b5563;
+            --muted-dark: #cbd5f5;
+            --card-light: #ffffff;
+            --card-dark: #1f2937;
+            --border-light: #e5e7eb;
+            --border-dark: #374151;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-light);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        body[data-theme="dark"] {
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+        }
+
+        .page-shell {
+            min-height: 100vh;
+            padding: 2rem clamp(1rem, 4vw, 4rem);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .page-header {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .heading-group h1 {
+            margin: 0;
+            font-size: clamp(1.5rem, 2vw, 2.25rem);
+        }
+
+        .heading-group p {
+            margin: 0.25rem 0 0;
+            color: var(--muted-light);
+        }
+
+        body[data-theme="dark"] .heading-group p {
+            color: var(--muted-dark);
+        }
+
+        .chart-card {
+            background: var(--card-light);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.05);
+            transition: background 0.3s ease, border-color 0.3s ease;
+            position: relative;
+        }
+
+        body[data-theme="dark"] .chart-card {
+            background: var(--card-dark);
+            border-color: var(--border-dark);
+            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.35);
+        }
+
+        .chart-controls {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            z-index: 5;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .theme-toggle {
+            border: 1px solid var(--border-light);
+            background: rgba(255, 255, 255, 0.85);
+            color: inherit;
+            width: 40px;
+            height: 40px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-size: 1.35rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+
+        body[data-theme="dark"] .theme-toggle {
+            background: rgba(15, 23, 42, 0.75);
+            border-color: var(--border-dark);
+        }
+
+        .chart-container {
+            width: 100%;
+            min-height: 440px;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <div class="page-shell">
+        <header class="page-header">
+            <div class="heading-group">
+                <h1>Financiamiento Innova por región (MM CLP)</h1>
+                <p>Comparativa de desembolsos acumulados destacando a la Región de Los Ríos.</p>
+            </div>
+        </header>
+
+        <section class="chart-card">
+            <div class="chart-controls">
+                <button id="theme-toggle" class="theme-toggle" aria-label="Cambiar tema" aria-pressed="false">🌙</button>
+            </div>
+            <div id="container" class="chart-container" role="img" aria-label="Gráfico de barras del financiamiento Innova por región"></div>
+        </section>
+
+        <table id="datatable" class="sr-only">
+            <caption>Financiamiento acumulado en millones de pesos chilenos</caption>
+            <thead>
+                <tr>
+                    <th>Región</th>
+                    <th>Financiamiento (MM CLP)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><th>Región del Biobío</th><td>43457.46</td></tr>
+                <tr><th>Región de los Lagos</th><td>36105.10</td></tr>
+                <tr><th>Región de La Araucanía</th><td>18621.40</td></tr>
+                <tr><th>Región de Los Ríos</th><td>11263.68</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const targetRegion = 'Región de Los Ríos';
+            const highlightColor = '#C0392B';
+            const economistPalette = ['#17415F', '#2E5A74', '#698494', '#A9B4BE'];
+            const themes = {
+                light: {
+                    text: '#0f172a',
+                    muted: '#4b5563',
+                    grid: '#e5e7eb',
+                    accent: '#1d4ed8'
+                },
+                dark: {
+                    text: '#f3f4f6',
+                    muted: '#cbd5f5',
+                    grid: '#374151',
+                    accent: '#93c5fd'
+                }
+            };
+
+            const chart = Highcharts.chart('container', {
+                data: {
+                    table: 'datatable'
+                },
+                chart: {
+                    type: 'column',
+                    backgroundColor: 'transparent',
+                    style: {
+                        fontFamily: 'Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif'
+                    },
+                    events: {
+                        load: function () {
+                            this.series[0].points.forEach((point, index) => {
+                                const paletteColor = economistPalette[index % economistPalette.length];
+                                point.update({
+                                    color: point.name === targetRegion ? highlightColor : paletteColor
+                                }, false);
+                            });
+                            this.redraw();
+                        }
+                    }
+                },
+                title: {
+                    text: 'Financiamiento Innova por región (MM CLP)'
+                },
+                subtitle: {
+                    text: 'Fuente: ETL CORFO - elaboración propia'
+                },
+                xAxis: {
+                    type: 'category',
+                    labels: {
+                        rotation: -35,
+                        style: { fontSize: '0.9rem' }
+                    }
+                },
+                yAxis: {
+                    allowDecimals: false,
+                    title: {
+                        text: 'Financiamiento (MM CLP)'
+                    }
+                },
+                legend: {
+                    enabled: false
+                },
+                tooltip: {
+                    valueSuffix: ' MM CLP'
+                },
+                plotOptions: {
+                    column: {
+                        borderRadius: 6,
+                        pointPadding: 0.15,
+                        dataLabels: {
+                            enabled: true,
+                            format: '{point.y:.1f}',
+                            style: { fontWeight: '600' }
+                        }
+                    }
+                }
+            });
+
+            const applyTheme = theme => {
+                const palette = themes[theme];
+                document.body.setAttribute('data-theme', theme);
+                chart.update({
+                    title: { style: { color: palette.text } },
+                    subtitle: { style: { color: palette.muted } },
+                    xAxis: {
+                        labels: { style: { color: palette.text } },
+                        lineColor: palette.grid,
+                        tickColor: palette.grid
+                    },
+                    yAxis: {
+                        labels: { style: { color: palette.text } },
+                        title: { style: { color: palette.text } },
+                        gridLineColor: palette.grid
+                    },
+                    tooltip: {
+                        backgroundColor: theme === 'light' ? 'rgba(255,255,255,0.95)' : 'rgba(15,23,42,0.9)',
+                        borderColor: theme === 'light' ? '#d1d5db' : '#475569',
+                        style: { color: palette.text }
+                    },
+                    plotOptions: {
+                        column: {
+                            dataLabels: {
+                                style: { color: palette.text }
+                            }
+                        }
+                    }
+                }, false);
+                chart.redraw();
+            };
+
+            const toggleButton = document.getElementById('theme-toggle');
+            let currentTheme = 'light';
+
+            const updateToggleIcon = () => {
+                const isLight = currentTheme === 'light';
+                toggleButton.textContent = isLight ? '🌙' : '☀️';
+                toggleButton.setAttribute('aria-pressed', String(!isLight));
+            };
+
+            toggleButton.addEventListener('click', () => {
+                currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+                updateToggleIcon();
+                applyTheme(currentTheme);
+            });
+
+            updateToggleIcon();
+            applyTheme(currentTheme);
+        });
+    </script>
+</body>
+</html>

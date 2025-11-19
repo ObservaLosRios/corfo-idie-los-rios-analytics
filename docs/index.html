@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cantidad de recursos CORFO asignados por año en I+D+i+e</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header Principal -->
+    <header class="main-header">
+        <div class="logos-container">
+            <img src="thumbnail_Logo observa.png" alt="Universidad Austral de Chile - Centro de Estudios Regionales" class="header-logo-left">
+            <img src="thumbnail_images.png" alt="Logo Región" class="header-logo">
+        </div>
+        <div class="header-content">
+            <h1 class="main-title" id="main-title">Cantidad de recursos CORFO asignado por año en I+D+i+e en la Región de Los Ríos</h1>
+            <p class="subtitle" id="subtitle">Semilla Inicia, Expande, Innova Región, Viraliza, etc. (Comite más nacional). Porcentaje de la inversión respecto del PIB regional.</p>
+        </div>
+    </header>
+    
+    <!-- Navegación -->
+    <nav class="nav-container">
+        <div class="nav-links" id="nav-links">
+            <span class="nav-link active" data-section="financiamiento-bar">Financiamiento acumulado</span>
+            <span class="nav-link" data-section="financiamiento-line">Evolución del financiamiento</span>
+            <span class="nav-link" data-section="proyectos-line">Proyectos adjudicados</span>
+        </div>
+    </nav>
+    
+    <!-- Container Principal -->
+    <div class="container">
+        <!-- Visualizaciones estáticas -->
+        <section id="financiamiento-bar" class="section">
+            <h2 class="section-title">Financiamiento Innova por región (MM CLP)</h2>
+            <p class="section-description">Comparativa de desembolsos acumulados destacando a la Región de Los Ríos.</p>
+            <div class="chart-card" data-theme="light">
+                <div class="chart-controls">
+                    <button id="financiamiento-bar-toggle" class="theme-toggle" aria-label="Cambiar tema" aria-pressed="false">🌙</button>
+                </div>
+                <div id="financiamiento-bar-chart" class="chart-container" role="img" aria-label="Gráfico de barras del financiamiento Innova por región"></div>
+            </div>
+        </section>
+
+        <section id="financiamiento-line" class="section">
+            <h2 class="section-title">Evolución del financiamiento Innova (MM CLP)</h2>
+            <p class="section-description">Serie anual para las regiones con mayor financiamiento, resaltando el comportamiento de Los Ríos.</p>
+            <div class="chart-card" data-theme="light">
+                <div class="chart-controls">
+                    <button id="financiamiento-line-toggle" class="theme-toggle" aria-label="Cambiar tema" aria-pressed="false">🌙</button>
+                </div>
+                <div id="financiamiento-line-chart" class="chart-container" role="img" aria-label="Gráfico de líneas del financiamiento anual"></div>
+            </div>
+        </section>
+
+        <section id="proyectos-line" class="section">
+            <h2 class="section-title">Proyectos Innova adjudicados por año</h2>
+            <p class="section-description">Conteo anual de proyectos para las regiones líderes, con énfasis en Los Ríos.</p>
+            <div class="chart-card" data-theme="light">
+                <div class="chart-controls">
+                    <button id="proyectos-line-toggle" class="theme-toggle" aria-label="Cambiar tema" aria-pressed="false">🌙</button>
+                </div>
+                <div id="proyectos-line-chart" class="chart-container" role="img" aria-label="Gráfico de líneas del número de proyectos"></div>
+            </div>
+        </section>
+
+        <!-- Secciones dinámicas se generarán aquí -->
+        <div id="dynamic-sections"></div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <p class="footer-text" id="footer-text">
+            Desarrollado por equipo CER UACh - Ciencia de datos<br>
+            Universidad Austral de Chile - Centro de Estudios Regionales
+        </p>
+        <img src="thumbnail_logo cer.png" alt="Universidad Austral de Chile - Centro de Estudios Regionales" class="footer-logo">
+    </footer>
+
+    <!-- Modal de configuración -->
+    <div id="configModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 style="color: #1B4F72; margin-bottom: 20px;">Configuración de la Plantilla</h2>
+            
+            <div class="config-section">
+                <h3>Información General</h3>
+                <label for="title-input">Título Principal:</label>
+                <input type="text" id="title-input" placeholder="Ej: Análisis de Ventas 2024">
+                
+                <label for="subtitle-input">Subtítulo:</label>
+                <input type="text" id="subtitle-input" placeholder="Ej: Reporte Trimestral de Resultados">
+                
+                <label for="footer-input">Texto del Footer:</label>
+                <textarea id="footer-input" placeholder="Ej: Análisis desarrollado por...&#10;Empresa - Departamento"></textarea>
+            </div>
+            
+            <div class="config-section">
+                <h3>Datos JSON</h3>
+                <label for="data-input">Datos (formato JSON):</label>
+                <textarea id="data-input" placeholder='Ejemplo:
+{
+  "charts": {
+    "ventas": {
+      "title": "Ventas por Mes",
+      "type": "bar",
+      "data": [{"mes": "Enero", "valor": 1000}, {"mes": "Febrero", "valor": 1200}]
+    },
+    "usuarios": {
+      "title": "Usuarios Activos",
+      "type": "line", 
+      "data": [{"fecha": "2024-01", "cantidad": 500}, {"fecha": "2024-02", "cantidad": 650}]
+    }
+  }
+}'></textarea>
+            </div>
+            
+            <div id="status-message"></div>
+            
+            <button class="btn" onclick="applyConfiguration()">Aplicar Configuración</button>
+            <button class="btn" onclick="loadExampleData()" style="background: #6c757d; margin-left: 10px;">Cargar Datos de Ejemplo</button>
+        </div>
+    </div>
+
+    <!-- Tooltip global -->
+    <div class="tooltip" id="tooltip"></div>
+
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/data.js"></script>
+    <script src="interactive.js"></script>
+</body>
+</html>

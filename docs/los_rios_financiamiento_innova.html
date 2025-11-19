@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Evolución del financiamiento Innova</title>
+    <script src="https://code.highcharts.com/highcharts.js" defer></script>
+    <style>
+        :root {
+            --bg-light: #f9fafb;
+            --bg-dark: #0f172a;
+            --text-light: #0f172a;
+            --text-dark: #f3f4f6;
+            --muted-light: #4b5563;
+            --muted-dark: #cbd5f5;
+            --card-light: #ffffff;
+            --card-dark: #1f2937;
+            --border-light: #e5e7eb;
+            --border-dark: #374151;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-light);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        body[data-theme="dark"] {
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+        }
+
+        .page-shell {
+            min-height: 100vh;
+            padding: 2rem clamp(1rem, 4vw, 4rem);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .page-header {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .page-header h1 {
+            margin: 0;
+            font-size: clamp(1.5rem, 2vw, 2.3rem);
+        }
+
+        .page-header p {
+            margin: 0.25rem 0 0;
+            color: var(--muted-light);
+        }
+
+        body[data-theme="dark"] .page-header p {
+            color: var(--muted-dark);
+        }
+
+        .chart-card {
+            position: relative;
+            background: var(--card-light);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.05);
+            transition:
+                background 0.3s ease,
+                border-color 0.3s ease;
+        }
+
+        body[data-theme="dark"] .chart-card {
+            background: var(--card-dark);
+            border-color: var(--border-dark);
+            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.35);
+        }
+
+        .chart-container {
+            width: 100%;
+            min-height: 480px;
+        }
+
+        .chart-controls {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            z-index: 5;
+        }
+
+        .theme-toggle {
+            border: 1px solid var(--border-light);
+            background: rgba(255, 255, 255, 0.85);
+            color: inherit;
+            width: 40px;
+            height: 40px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+
+        body[data-theme="dark"] .theme-toggle {
+            background: rgba(15, 23, 42, 0.75);
+            border-color: var(--border-dark);
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <div class="page-shell">
+        <header class="page-header">
+            <h1>Evolución del financiamiento Innova (MM CLP)</h1>
+            <p>Serie anual para las regiones con mayor financiamiento, destacando a la Región de Los Ríos.</p>
+        </header>
+
+        <section class="chart-card">
+            <div class="chart-controls">
+                <button id="theme-toggle" class="theme-toggle" aria-label="Cambiar tema" aria-pressed="false">🌙</button>
+            </div>
+            <div id="container" class="chart-container"></div>
+        </section>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const palette = {
+                losRios: '#1DA0FF', // matching highlight blue from reference chart
+                biobio: '#6F52ED',
+                lagos: '#16C47F',
+                araucania: '#FF7B39'
+            };
+
+            const seriesData = [
+                {
+                    name: 'Región del Biobío',
+                    color: palette.biobio,
+                    marker: { symbol: 'diamond' },
+                    data: [760.91, 1523.84, 1719.92, 2366.97, 624.45, 1667.64, 5117.76, 5158.2, 4442.28, 1892.58, 3221.4, 1187.01, 2311.04, 2747.18, 2970.02, 2954.09, 2792.18]
+                },
+                {
+                    name: 'Región de los Lagos',
+                    color: palette.lagos,
+                    marker: { symbol: 'square' },
+                    data: [3994.67, 873.87, 2267.49, 3087.66, 1444.69, 1988.39, 2440.72, 3151.55, 3336.79, 3031.21, 2219.95, 1205.47, 1625.21, 1501.56, 2126.64, 1356.88, 452.35]
+                },
+                {
+                    name: 'Región de La Araucanía',
+                    color: palette.araucania,
+                    marker: { symbol: 'triangle' },
+                    data: [596.51, 1785.56, 2565.9, 2210.91, 1058.12, 954.15, 1262.7, 1188.98, 583.47, 1753.35, 649.42, 337.82, 448.87, 331.88, 1838.55, 502.87, 552.33]
+                },
+                {
+                    name: 'Región de Los Ríos',
+                    color: palette.losRios,
+                    lineWidth: 4,
+                    marker: { enabled: true, radius: 5, symbol: 'circle' },
+                    data: [367.93, 279.14, 1430.88, 1000.61, 582.98, 1018.21, 970.73, 826.04, 487.25, 467.28, 357.41, 176.29, 387.77, 783.23, 829.09, 674.66, 624.19]
+                }
+            ];
+
+            const themes = {
+                light: {
+                    text: '#0f172a',
+                    muted: '#4b5563',
+                    grid: '#d1d5db'
+                },
+                dark: {
+                    text: '#f3f4f6',
+                    muted: '#cbd5f5',
+                    grid: '#475569'
+                }
+            };
+
+            const chart = Highcharts.chart('container', {
+                chart: {
+                    backgroundColor: 'transparent',
+                    style: {
+                        fontFamily: 'Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif'
+                    }
+                },
+                title: {
+                    text: 'Crecimiento del financiamiento Innova por región',
+                    align: 'left'
+                },
+                subtitle: {
+                    text: 'Fuente: ETL CORFO - elaboración propia',
+                    align: 'left'
+                },
+                yAxis: {
+                    title: {
+                        text: 'Monto (MM CLP)'
+                    }
+                },
+                xAxis: {
+                    accessibility: {
+                        rangeDescription: 'Cobertura 2009-2025'
+                    }
+                },
+                legend: {
+                    layout: 'vertical',
+                    align: 'right',
+                    verticalAlign: 'middle'
+                },
+                tooltip: {
+                    shared: true,
+                    valueSuffix: ' MM CLP'
+                },
+                plotOptions: {
+                    series: {
+                        label: {
+                            connectorAllowed: false
+                        },
+                        marker: {
+                            enabled: true,
+                            radius: 4,
+                            lineWidth: 1,
+                            lineColor: '#ffffff'
+                        },
+                        pointStart: 2009
+                    }
+                },
+                series: seriesData,
+                credits: {
+                    enabled: false
+                },
+                responsive: {
+                    rules: [{
+                        condition: {
+                            maxWidth: 640
+                        },
+                        chartOptions: {
+                            legend: {
+                                layout: 'horizontal',
+                                align: 'center',
+                                verticalAlign: 'bottom'
+                            }
+                        }
+                    }]
+                }
+            });
+
+            const toggleButton = document.getElementById('theme-toggle');
+            let currentTheme = 'light';
+
+            const applyTheme = theme => {
+                const palette = themes[theme];
+                document.body.setAttribute('data-theme', theme);
+
+                chart.setTitle(
+                    {
+                        text: 'Crecimiento del financiamiento Innova por región',
+                        style: { color: palette.text }
+                    },
+                    {
+                        text: 'Fuente: ETL CORFO - elaboración propia',
+                        style: { color: palette.muted }
+                    },
+                    false
+                );
+
+                chart.xAxis[0].update({
+                    labels: { style: { color: palette.text } },
+                    lineColor: palette.grid,
+                    tickColor: palette.grid
+                }, false);
+
+                chart.yAxis[0].update({
+                    labels: { style: { color: palette.text } },
+                    title: { style: { color: palette.text } },
+                    gridLineColor: palette.grid
+                }, false);
+
+                chart.update({
+                    legend: {
+                        itemStyle: { color: palette.text },
+                        itemHoverStyle: { color: palette.muted }
+                    },
+                    tooltip: {
+                        backgroundColor: theme === 'light' ? 'rgba(255,255,255,0.95)' : 'rgba(15,23,42,0.9)',
+                        borderColor: theme === 'light' ? '#d1d5db' : '#475569',
+                        style: { color: palette.text }
+                    }
+                }, false);
+
+                chart.redraw();
+            };
+
+            const updateToggleIcon = () => {
+                const isLight = currentTheme === 'light';
+                toggleButton.textContent = isLight ? '🌙' : '☀️';
+                toggleButton.setAttribute('aria-pressed', String(!isLight));
+            };
+
+            toggleButton.addEventListener('click', () => {
+                currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+                updateToggleIcon();
+                applyTheme(currentTheme);
+            });
+
+            updateToggleIcon();
+            applyTheme(currentTheme);
+        });
+    </script>
+</body>
+</html>

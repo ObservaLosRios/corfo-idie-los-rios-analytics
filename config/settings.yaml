@@ -1,0 +1,29 @@
+paths:
+  raw_dataset: data/raw/corfo_idie_los_rios_recursos_anuales.csv
+  processed_dir: data/processed
+  interim_dir: data/interim
+output:
+  csv_name: corfo_projects.csv
+  parquet_name: corfo_projects.parquet
+etl:
+  chunk_size: 1000
+  currency_columns:
+    - Financiamiento Innova
+    - Aprobado Privado
+    - Aprobado Privado Pecuniario
+    - Monto Certificado Ley
+  date_columns:
+    - Inicio Actividad Económica
+  boolean_mappings:
+    affirmative:
+      - "Sí"
+      - "SI"
+      - "si"
+      - "VIGENTE"
+      - "Incentivo"
+      - "Convocatoria"
+      - "true"
+    negative:
+      - "No"
+      - "NO"
+      - "false"
