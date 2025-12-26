@@ -24,7 +24,7 @@ from src.viz.los_rios_data import (
 )
 
 DATA_PATH = PROJECT_ROOT / "data/processed/corfo_projects.csv"
-OUTPUT_HTML = PROJECT_ROOT / "docs/los_rios_financiamiento_innova.html"
+PLOTLY_OUTPUT_HTML = PROJECT_ROOT / "docs/plotly_los_rios_financiamiento_innova.html"
 
 
 def build_finance_figure(
@@ -113,8 +113,12 @@ def main() -> None:
         yaxis_title="Monto (MM CLP)",
         annotate_peak=True,
     )
-    figure_to_html(figure, OUTPUT_HTML, title="Financiamiento Innova por región")
-    print(f"Archivo HTML generado en {OUTPUT_HTML.relative_to(PROJECT_ROOT)}")
+    figure_to_html(
+        figure,
+        PLOTLY_OUTPUT_HTML,
+        title="Financiamiento Innova por región",
+    )
+    print(f"Archivo HTML (Plotly) generado en {PLOTLY_OUTPUT_HTML.relative_to(PROJECT_ROOT)}")
 
 
 if __name__ == "__main__":

@@ -23,6 +23,7 @@ from src.viz.los_rios_data import PALETTE, TARGET_REGION, build_region_summary, 
 
 DATA_PATH = PROJECT_ROOT / "data/processed/corfo_projects.csv"
 OUTPUT_HTML = PROJECT_ROOT / "docs/los_rios_financiamiento_bar.html"
+PLOTLY_OUTPUT_HTML = PROJECT_ROOT / "docs/plotly_los_rios_financiamiento_bar.html"
 
 
 def build_bar_figure(summary: pd.DataFrame) -> go.Figure:
@@ -74,10 +75,10 @@ def main() -> None:
     figure = build_bar_figure(summary)
     figure_to_html(
         figure,
-        OUTPUT_HTML,
+        PLOTLY_OUTPUT_HTML,
         title="Financiamiento Innova por región",
     )
-    print(f"Archivo HTML generado en {OUTPUT_HTML.relative_to(PROJECT_ROOT)}")
+    print(f"Archivo HTML (Plotly) generado en {PLOTLY_OUTPUT_HTML.relative_to(PROJECT_ROOT)}")
 
 
 if __name__ == "__main__":

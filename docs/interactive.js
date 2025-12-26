@@ -1,26 +1,31 @@
 document.addEventListener('DOMContentLoaded', () => {
 	initNavigation();
-	initFinanciamientoBarChart();
 	initFinanciamientoLineChart();
+	initFinanciamientoBarChart();
 	initProyectosLineChart();
 });
 
-const baseThemes = {
-	light: {
-		text: '#0f172a',
-		muted: '#4b5563',
-		grid: '#d1d5db',
-		tooltipBg: 'rgba(255,255,255,0.95)',
-		tooltipBorder: '#d1d5db'
-	},
-	dark: {
-		text: '#f3f4f6',
-		muted: '#cbd5f5',
-		grid: '#475569',
-		tooltipBg: 'rgba(15,23,42,0.9)',
-		tooltipBorder: '#475569'
-	}
-};
+function getExportingOptions() {
+	return {
+		enabled: true,
+		buttons: {
+			contextButton: {
+				menuItems: [
+					'viewFullscreen',
+					'printChart',
+					'separator',
+					'downloadPNG',
+					'downloadJPEG',
+					'downloadSVG',
+					'separator',
+					'downloadCSV',
+					'downloadXLS',
+					'viewData'
+				]
+			}
+		}
+	};
+}
 
 function initNavigation() {
 	const navLinks = document.querySelectorAll('.nav-link');
@@ -54,20 +59,11 @@ function triggerReloadEffect(container) {
 	setTimeout(() => container.classList.remove('reload-pulse'), 600);
 }
 
-function updateToggleIcon(button, theme) {
-	if (!button) return;
-	const isLight = theme === 'light';
-	button.textContent = isLight ? '🌙' : '☀️';
-	button.setAttribute('aria-pressed', String(!isLight));
-}
-
 function initFinanciamientoBarChart() {
 	if (typeof Highcharts === 'undefined') return;
 	const containerId = 'financiamiento-bar-chart';
 	const containerEl = document.getElementById(containerId);
-	const toggleButton = document.getElementById('financiamiento-bar-toggle');
-	const card = toggleButton ? toggleButton.closest('.chart-card') : null;
-	if (!containerEl || !toggleButton || !card) return;
+	if (!containerEl) return;
 
 	const targetRegion = 'Región de Los Ríos';
 	const highlightColor = '#C0392B';
@@ -88,9 +84,21 @@ function initFinanciamientoBarChart() {
 			}
 		},
 		title: { text: 'Financiamiento Innova por región (MM CLP)' },
-		subtitle: { text: 'Fuente: ETL CORFO - elaboración propia' },
+		subtitle: {
+			text: 'Fuente: ETL CORFO - elaboración propia',
+			align: 'left',
+			verticalAlign: 'bottom',
+			floating: true,
+			x: 10,
+			y: -20,
+			style: {
+				fontSize: '0.8em',
+				color: '#666666'
+			}
+		},
 		xAxis: {
 			type: 'category',
+			title: { text: 'Región' },
 			labels: { rotation: -35, style: { fontSize: '0.9rem' } }
 		},
 		yAxis: {
@@ -117,53 +125,9 @@ function initFinanciamientoBarChart() {
 				color: point.name === targetRegion ? highlightColor : economistPalette[index % economistPalette.length]
 			}))
 		}],
+		exporting: getExportingOptions(),
 		credits: { enabled: false }
 	});
-
-	let currentTheme = 'light';
-
-	const applyTheme = theme => {
-		const palette = baseThemes[theme];
-		card.setAttribute('data-theme', theme);
-		chart.update({
-			title: { style: { color: palette.text } },
-			subtitle: { style: { color: palette.muted } },
-			tooltip: {
-				backgroundColor: palette.tooltipBg,
-				borderColor: palette.tooltipBorder,
-				style: { color: palette.text }
-			},
-			plotOptions: {
-				column: {
-					dataLabels: {
-						style: { color: palette.text }
-					}
-				}
-			}
-		}, false);
-
-		chart.xAxis[0].update({
-			labels: { style: { color: palette.text } },
-			lineColor: palette.grid,
-			tickColor: palette.grid
-		}, false);
-
-		chart.yAxis[0].update({
-			labels: { style: { color: palette.text } },
-			title: { style: { color: palette.text } },
-			gridLineColor: palette.grid
-		}, false);
-
-		chart.redraw();
-		updateToggleIcon(toggleButton, theme);
-	};
-
-	toggleButton.addEventListener('click', () => {
-		currentTheme = currentTheme === 'light' ? 'dark' : 'light';
-		applyTheme(currentTheme);
-	});
-
-	applyTheme(currentTheme);
 	triggerReloadEffect(containerEl);
 }
 
@@ -171,9 +135,7 @@ function initFinanciamientoLineChart() {
 	if (typeof Highcharts === 'undefined') return;
 	const containerId = 'financiamiento-line-chart';
 	const containerEl = document.getElementById(containerId);
-	const toggleButton = document.getElementById('financiamiento-line-toggle');
-	const card = toggleButton ? toggleButton.closest('.chart-card') : null;
-	if (!containerEl || !toggleButton || !card) return;
+	if (!containerEl) return;
 
 	const palette = {
 		losRios: '#1DA0FF',
@@ -223,12 +185,21 @@ function initFinanciamientoLineChart() {
 		},
 		subtitle: {
 			text: 'Fuente: ETL CORFO - elaboración propia',
-			align: 'left'
+			align: 'left',
+			verticalAlign: 'bottom',
+			floating: true,
+			x: 10,
+			y: -20,
+			style: {
+				fontSize: '0.8em',
+				color: '#666666'
+			}
 		},
 		yAxis: {
 			title: { text: 'Monto (MM CLP)' }
 		},
 		xAxis: {
+			title: { text: 'Año' },
 			accessibility: { rangeDescription: 'Cobertura 2009-2025' }
 		},
 		legend: {
@@ -253,6 +224,7 @@ function initFinanciamientoLineChart() {
 			}
 		},
 		series: seriesData,
+		exporting: getExportingOptions(),
 		credits: { enabled: false },
 		responsive: {
 			rules: [{
@@ -267,59 +239,6 @@ function initFinanciamientoLineChart() {
 			}]
 		}
 	});
-
-	let currentTheme = 'light';
-
-	const applyTheme = theme => {
-		const palette = baseThemes[theme];
-		card.setAttribute('data-theme', theme);
-
-		chart.setTitle(
-			{
-				text: 'Crecimiento del financiamiento Innova por región',
-				style: { color: palette.text }
-			},
-			{
-				text: 'Fuente: ETL CORFO - elaboración propia',
-				style: { color: palette.muted }
-			},
-			false
-		);
-
-		chart.xAxis[0].update({
-			labels: { style: { color: palette.text } },
-			lineColor: palette.grid,
-			tickColor: palette.grid
-		}, false);
-
-		chart.yAxis[0].update({
-			labels: { style: { color: palette.text } },
-			title: { style: { color: palette.text } },
-			gridLineColor: palette.grid
-		}, false);
-
-		chart.update({
-			legend: {
-				itemStyle: { color: palette.text },
-				itemHoverStyle: { color: palette.muted }
-			},
-			tooltip: {
-				backgroundColor: palette.tooltipBg,
-				borderColor: palette.tooltipBorder,
-				style: { color: palette.text }
-			}
-		}, false);
-
-		chart.redraw();
-		updateToggleIcon(toggleButton, theme);
-	};
-
-	toggleButton.addEventListener('click', () => {
-		currentTheme = currentTheme === 'light' ? 'dark' : 'light';
-		applyTheme(currentTheme);
-	});
-
-	applyTheme(currentTheme);
 	triggerReloadEffect(containerEl);
 }
 
@@ -327,9 +246,7 @@ function initProyectosLineChart() {
 	if (typeof Highcharts === 'undefined') return;
 	const containerId = 'proyectos-line-chart';
 	const containerEl = document.getElementById(containerId);
-	const toggleButton = document.getElementById('proyectos-line-toggle');
-	const card = toggleButton ? toggleButton.closest('.chart-card') : null;
-	if (!containerEl || !toggleButton || !card) return;
+	if (!containerEl) return;
 
 	const palette = {
 		losRios: '#1DA0FF',
@@ -379,13 +296,22 @@ function initProyectosLineChart() {
 		},
 		subtitle: {
 			text: 'Fuente: ETL CORFO - elaboración propia',
-			align: 'left'
+			align: 'left',
+			verticalAlign: 'bottom',
+			floating: true,
+			x: 10,
+			y: -20,
+			style: {
+				fontSize: '0.8em',
+				color: '#666666'
+			}
 		},
 		yAxis: {
 			title: { text: 'Número de proyectos' },
 			allowDecimals: false
 		},
 		xAxis: {
+			title: { text: 'Año' },
 			accessibility: { rangeDescription: 'Cobertura 2009-2025' }
 		},
 		legend: {
@@ -410,6 +336,7 @@ function initProyectosLineChart() {
 			}
 		},
 		series: seriesData,
+		exporting: getExportingOptions(),
 		credits: { enabled: false },
 		responsive: {
 			rules: [{
@@ -424,58 +351,5 @@ function initProyectosLineChart() {
 			}]
 		}
 	});
-
-	let currentTheme = 'light';
-
-	const applyTheme = theme => {
-		const palette = baseThemes[theme];
-		card.setAttribute('data-theme', theme);
-
-		chart.setTitle(
-			{
-				text: 'Conteo de proyectos adjudicados (Top regiones)',
-				style: { color: palette.text }
-			},
-			{
-				text: 'Fuente: ETL CORFO - elaboración propia',
-				style: { color: palette.muted }
-			},
-			false
-		);
-
-		chart.xAxis[0].update({
-			labels: { style: { color: palette.text } },
-			lineColor: palette.grid,
-			tickColor: palette.grid
-		}, false);
-
-		chart.yAxis[0].update({
-			labels: { style: { color: palette.text } },
-			title: { style: { color: palette.text } },
-			gridLineColor: palette.grid
-		}, false);
-
-		chart.update({
-			legend: {
-				itemStyle: { color: palette.text },
-				itemHoverStyle: { color: palette.muted }
-			},
-			tooltip: {
-				backgroundColor: palette.tooltipBg,
-				borderColor: palette.tooltipBorder,
-				style: { color: palette.text }
-			}
-		}, false);
-
-		chart.redraw();
-		updateToggleIcon(toggleButton, theme);
-	};
-
-	toggleButton.addEventListener('click', () => {
-		currentTheme = currentTheme === 'light' ? 'dark' : 'light';
-		applyTheme(currentTheme);
-	});
-
-	applyTheme(currentTheme);
 	triggerReloadEffect(containerEl);
 }

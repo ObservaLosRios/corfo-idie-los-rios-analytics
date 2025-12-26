@@ -23,7 +23,7 @@ from src.viz.los_rios_data import (
 )
 
 DATA_PATH = PROJECT_ROOT / "data/processed/corfo_projects.csv"
-OUTPUT_HTML = PROJECT_ROOT / "docs/los_rios_proyectos_line.html"
+PLOTLY_OUTPUT_HTML = PROJECT_ROOT / "docs/plotly_los_rios_proyectos_line.html"
 
 
 def build_line_chart(
@@ -68,8 +68,8 @@ def main() -> None:
 	color_map = build_region_color_map(top_regions)
 	yearly_projects = build_yearly_region_projects(dataset, top_regions)
 	figure = build_line_chart(yearly_projects, top_regions, color_map)
-	figure_to_html(figure, OUTPUT_HTML, title="Conteo anual de proyectos")
-	print(f"Archivo HTML generado en {OUTPUT_HTML.relative_to(PROJECT_ROOT)}")
+	figure_to_html(figure, PLOTLY_OUTPUT_HTML, title="Conteo anual de proyectos")
+	print(f"Archivo HTML (Plotly) generado en {PLOTLY_OUTPUT_HTML.relative_to(PROJECT_ROOT)}")
 
 
 if __name__ == "__main__":

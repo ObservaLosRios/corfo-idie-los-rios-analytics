@@ -22,8 +22,8 @@
     <!-- Navegación -->
     <nav class="nav-container">
         <div class="nav-links" id="nav-links">
-            <span class="nav-link active" data-section="financiamiento-bar">Financiamiento acumulado</span>
-            <span class="nav-link" data-section="financiamiento-line">Evolución del financiamiento</span>
+            <span class="nav-link active" data-section="financiamiento-line">Evolución del financiamiento</span>
+            <span class="nav-link" data-section="financiamiento-bar">Financiamiento acumulado</span>
             <span class="nav-link" data-section="proyectos-line">Proyectos adjudicados</span>
         </div>
     </nav>
@@ -31,35 +31,26 @@
     <!-- Container Principal -->
     <div class="container">
         <!-- Visualizaciones estáticas -->
-        <section id="financiamiento-bar" class="section">
-            <h2 class="section-title">Financiamiento Innova por región (MM CLP)</h2>
-            <p class="section-description">Comparativa de desembolsos acumulados destacando a la Región de Los Ríos.</p>
-            <div class="chart-card" data-theme="light">
-                <div class="chart-controls">
-                    <button id="financiamiento-bar-toggle" class="theme-toggle" aria-label="Cambiar tema" aria-pressed="false">🌙</button>
-                </div>
-                <div id="financiamiento-bar-chart" class="chart-container" role="img" aria-label="Gráfico de barras del financiamiento Innova por región"></div>
-            </div>
-        </section>
-
         <section id="financiamiento-line" class="section">
             <h2 class="section-title">Evolución del financiamiento Innova (MM CLP)</h2>
             <p class="section-description">Serie anual para las regiones con mayor financiamiento, resaltando el comportamiento de Los Ríos.</p>
-            <div class="chart-card" data-theme="light">
-                <div class="chart-controls">
-                    <button id="financiamiento-line-toggle" class="theme-toggle" aria-label="Cambiar tema" aria-pressed="false">🌙</button>
-                </div>
+            <div class="chart-card">
                 <div id="financiamiento-line-chart" class="chart-container" role="img" aria-label="Gráfico de líneas del financiamiento anual"></div>
+            </div>
+        </section>
+
+        <section id="financiamiento-bar" class="section">
+            <h2 class="section-title">Financiamiento Innova por región (MM CLP)</h2>
+            <p class="section-description">Comparativa de desembolsos acumulados destacando a la Región de Los Ríos.</p>
+            <div class="chart-card">
+                <div id="financiamiento-bar-chart" class="chart-container" role="img" aria-label="Gráfico de barras del financiamiento Innova por región"></div>
             </div>
         </section>
 
         <section id="proyectos-line" class="section">
             <h2 class="section-title">Proyectos Innova adjudicados por año</h2>
             <p class="section-description">Conteo anual de proyectos para las regiones líderes, con énfasis en Los Ríos.</p>
-            <div class="chart-card" data-theme="light">
-                <div class="chart-controls">
-                    <button id="proyectos-line-toggle" class="theme-toggle" aria-label="Cambiar tema" aria-pressed="false">🌙</button>
-                </div>
+            <div class="chart-card">
                 <div id="proyectos-line-chart" class="chart-container" role="img" aria-label="Gráfico de líneas del número de proyectos"></div>
             </div>
         </section>
@@ -126,7 +117,10 @@
     <div class="tooltip" id="tooltip"></div>
 
     <script src="https://code.highcharts.com/highcharts.js"></script>
-    <script src="https://code.highcharts.com/modules/data.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/full-screen.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
     <script src="interactive.js"></script>
 </body>
 </html>
